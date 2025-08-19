@@ -1,0 +1,166 @@
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+
+api = FastAPI()
+
+@api.get("/files")
+async def get_files() -> HTMLResponse:
+    return HTMLResponse("""
+    <doctype! HTML>
+<style>
+
+.row-article {
+  	align-items: center;  /* vertically aligns items along the cross axis */
+  	gap: 15px;            /* spacing between elements */
+	display: flex;
+	margin-bottom: 10px;
+	white-space: nowrap;
+	flex-wrap: nowrap;
+}
+
+.btn {
+  display: inline-block;
+  background-color: #4CAF50; /* Green background */
+  color: white;             /* White text */
+  padding: 2px 6px;        /* Small padding */
+  font-size: 0.85rem;       /* Small font size */
+  text-decoration: none;    /* Remove underline */
+  border-radius: 10px;       /* Rounded corners */
+  border: none;             /* No border */
+  cursor: pointer;          /* Pointer cursor on hover */
+  transition: background-color 0.3s ease;
+  size: 5px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.btn:hover,
+.btn:focus {
+  background-color: #45a049; /* Darker green on hover/focus */
+  outline: none;
+}
+
+.id {
+	display: inline-block;  /* or inline */
+	margin: 0 10px 0 0;    /* optional spacing */
+  	vertical-align: middle; /* align nicely */
+	flex-shrink: 0;
+}
+
+.date {
+	display: inline-block;  /* or inline */
+	margin: 0 10px 0 0;    /* optional spacing */
+  	vertical-align: middle; /* align nicely */
+	flex-shrink: 0;
+
+}
+
+.title {
+	display: inline-block;  /* or inline */
+  	vertical-align: middle; /* align nicely */
+	flex-grow: 1;
+	background: none;       /* Remove background */
+  	border: none;           /* Remove border */
+  	padding: 0;             /* Remove padding */
+  	margin: 0;              /* Remove margin */
+  	font: inherit;          /* Inherit font-family, size, weight */
+  	color: inherit;         /* Inherit text color */
+  	cursor: pointer;        /* Keep pointer cursor on hover */
+
+}
+
+.pimtitle {
+	text-align: center;
+	color: rgb(82, 82, 82);
+	font-family: monospace;
+}
+
+.input_block {
+	display: flex;
+	justify-content: center; /* center horizontally */
+	align-items: center;     /* center vertically if container has height */
+	margin-bottom: 5px;
+}
+
+.btns {
+	display: flex;
+	justify-content: center; /* center horizontally */
+}
+
+.cpbtn {
+	background-color: rgb(255, 123, 0);
+	color: white;
+	border: none;
+	margin-right: 10px;
+
+}
+.sbtn {
+	background-color: rgb(60, 129, 188);
+	color: white;
+	border: none;
+}
+
+.hidden {
+      display: none; /* hides the paragraph by default */
+}
+
+.text-box {
+    border: 2px solid #333;     /* box border */
+    padding: 15px;              /* space inside the box */
+    background-color: #f9f9f9;  /* background color */
+    width: fit-content;         /* box adjusts to text size */
+    border-radius: 6px;         /* rounded corners */
+}
+
+</style>
+
+<head>
+	<title>PIM labs Search-view</title>
+</head>
+<body>
+	</body>
+	<div>
+		<h1 class="pimtitle">PIM labs</h1>
+	</div>
+	<div class="input_block">
+		<input type="text" name="" id="search_box">
+	</div>
+	<div class="btns">
+		<button class="cpbtn">Create particle</button>
+		<button class="sbtn">Search</button>
+	</div>
+		<ul>
+		<article class="row-article">
+			<span>
+				<p class="id">#0</p>
+				<time class="date" datetime="2025-08-13">2025-12-24</time>
+				<button class="title">Essay on the Modern Synthesis</button>
+				<p class="hidden" class="text-box">Contents that have been hidden in search view</p>
+				<a href="https://google.com" class="btn">View</a>
+				<a href="https://kreauniv.github.io/comp350/pim.html" class="btn">Edit</a>
+			</span>
+		</article>
+		<article class="row-article">
+			<span>
+				<p class="id">#0</p>
+				<time class="date" datetime="2025-08-13">2025-12-24</time>
+				<button class="title">Variation and Mutation</button>
+				<a href="https://google.com" class="btn">View</a>
+				<a href="https://kreauniv.github.io/comp350/pim.html" class="btn">Edit</a>
+			</span>
+		</article>
+		<article class="row-article">
+			<span>
+				<p class="id">#0</p>
+				<time class="date" datetime="2025-08-13">2025-12-24</time>
+				<button class="title">Mechanisms of Positive Selection</button>
+				<a href="https://google.com" class="btn">View</a>
+				<a href="https://kreauniv.github.io/comp350/pim.html" class="btn">Edit</a>
+			</span>
+		</article>
+	</ul>
+
+</body>
+
+</doctype>
+""")

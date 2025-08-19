@@ -1,0 +1,68 @@
+<doctype! HTML>
+    <style>
+        .pimtitle {
+            color: rgb(82, 82, 82);
+	        font-family: monospace;
+        }
+        .material-icons {
+            opacity: 30%;
+        }
+
+        .btn {
+            background-color: rgb(0, 141, 228);
+            display: inline-block;
+            color: white;             /* White text */
+            padding: 2px 6px;        /* Small padding */
+            font-size: 0.85rem;       /* Small font size */
+            text-decoration: none;    /* Remove underline */
+            border-radius: 2px;       /* Rounded corners */
+            border: none;             /* No border */
+            cursor: pointer;          /* Pointer cursor on hover */
+            transition: background-color 0.3s ease;
+            flex-shrink: 0;
+            margin-top: 10px;
+            margin-left: 90px;
+        }
+        html {
+  font-size: 24px; 
+}
+body {
+  transform: scale(1.2);  
+  transform-origin: top left;
+}
+
+    </style>
+    <head>
+        <title>PIM labs Login-view</title> 
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    </head>
+    <body>
+        <div class="all">
+        <div>
+		    <h1 class="pimtitle">PIM labs</h1>
+	    </div>
+        <div class ="input-wrapper">
+            <span>
+                <input type="text" name="Username" placeholder="Username" id="username" class="input_fields">
+                <i class="material-icons">person</i>
+            </span>
+
+        </div>
+        <div class ="input-wrapper">
+             <span>
+                <input type="text" name="Password" placeholder="Password" id="password">
+                <i class="material-icons">lock</i>
+            </span>
+        </div>
+        <div>
+            <span>
+                <button class="btn">Sign in</button>
+             </span>
+        </div>
+        </div>
+        </body>
+    <script>
+
+    </script>
+
+</doctype>

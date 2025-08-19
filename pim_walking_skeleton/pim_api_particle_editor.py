@@ -1,0 +1,134 @@
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+
+api = FastAPI()
+
+@api.get("/files")
+async def get_files() -> HTMLResponse:
+    return HTMLResponse("""
+    <!DOCTYPE html>
+<style>
+
+.id {
+	display: inline-block;  /* or inline */
+	margin: 0 10px 0 0;    /* optional spacing */
+  	vertical-align: middle; /* align nicely */
+	flex-shrink: 0;
+}
+
+.btn {
+  display: inline-block;
+  background-color: #4CAF50; /* Green background */
+  color: white;             /* White text */
+  padding: 2px 6px;        /* Small padding */
+  font-size: 0.85rem;       /* Small font size */
+  text-decoration: none;    /* Remove underline */
+  border-radius: 10px;       /* Rounded corners */
+  border: none;             /* No border */
+  cursor: pointer;          /* Pointer cursor on hover */
+  transition: background-color 0.3s ease;
+  size: 5px;
+  flex-shrink: 0;
+  margin-left: 450px;
+
+}
+
+.title {
+	display: inline-block;  /* or inline */
+  	vertical-align: middle; /* align nicely */
+	flex-grow: 1;
+    margin-left: 15px;
+}
+
+.btn:hover,
+.btn:focus {
+  background-color: #45a049; /* Darker green on hover/focus */
+  outline: none;
+}
+
+.hashtag {
+  margin-top: 10px;
+  display: inline-block;
+  background-color: purple; /* Green background */
+  color: white;             /* White text */
+  padding: 2px 6px;        /* Small padding */
+  font-size: 0.85rem;       /* Small font size */
+  text-decoration: none;    /* Remove underline */
+  border-radius: 10px;       /* Rounded corners */
+  border: none;             /* No border */
+  cursor: pointer;          /* Pointer cursor on hover */
+  transition: background-color 0.3s ease;
+  size: 5px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.hashtag:hover,
+.hashtag:focus {
+  background-color: rgb(91, 2, 91); /* Darker green on hover/focus */
+  outline: none;
+}
+
+.particle-ref {
+  display: inline-block;
+  background-color: orangered; /* Green background */
+  color: white;             /* White text */
+  padding: 2px 6px;        /* Small padding */
+  font-size: 0.85rem;       /* Small font size */
+  text-decoration: none;    /* Remove underline */
+  border-radius: 10px;       /* Rounded corners */
+  border: none;             /* No border */
+  cursor: pointer;          /* Pointer cursor on hover */
+  transition: background-color 0.3s ease;
+  size: 5px;
+  flex-shrink: 0;
+  text-align: center;
+  margin-left: 550px;
+}
+
+.particle-ref:hover,
+.particle-ref:focus {
+  background-color: rgb(160, 45, 3); /* Darker green on hover/focus */
+  outline: none;
+}
+
+.hidden {
+      display: none; /* hides the paragraph by default */
+}
+
+.text-box {
+    border: 0.5px solid #7c7a7a;     /* box border */
+    padding: 15px;              /* space inside the box */
+    background-color: #f9f9f9;  /* background color */
+    width: fit-content;         /* box adjusts to text size */
+
+  }
+</style>
+<html>
+    <head>
+        <title>PIM Particle Editor</title>
+    </head>
+    <body>
+        <h3>Particle Editor</h3>
+        <article>
+            <span>
+				<p class="id">#0</p>
+				<time class="date" datetime="2025-08-13">2025-12-24</time>
+				<input class="title" placeholder="title">
+				<a href="https://kreauniv.github.io/comp350/pim.html" class="btn">Edit</a>
+			</span>
+      <div><input class="text-box" placeholder="Contents"></div>
+
+        </article>
+        <div>
+             <span>
+                <a href="https://www.google.com/" class="hashtag">#Markdown</a>
+                <a href="https://www.google.com/" class="hashtag">#HTML</a>
+                <a href="https://www.google.com/" class="hashtag">#CSS</a>
+                <a href="https://www.google.com/" class="particle-ref">#45</a>
+             </span>
+        </div>
+        <!--<p class="text-box"> just a test how does this look</p>-->
+    </body>
+</html>
+    """)    
