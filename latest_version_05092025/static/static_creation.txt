@@ -1,0 +1,1 @@
+this is the submission folder for the static (html) files
