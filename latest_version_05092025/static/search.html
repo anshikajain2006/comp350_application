@@ -1,0 +1,182 @@
+<doctype! HTML>
+<style>
+
+body {
+    font-size: 1.2em;
+    size: 10000;
+    height: 100vh;
+    display: flex;
+    justify-content: center; /* horizontal centering */
+    align-items: center;     /* vertical centering */
+}
+
+body > div {
+  width: 100%;       /* or a fixed width like 400px */
+  max-width: 400px;  /* limits container width */
+}
+
+ h1 {
+    color: rgb(82, 82, 82);
+    /*font-family: Georgia, 'Times New Roman', Times, serif;*/
+    margin-bottom: 20px;
+    text-align: center;
+}   
+
+.input_block {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.row-article {
+  	align-items: center;  /* vertically aligns items along the cross axis */
+  	gap: 15px;            /* spacing between elements */
+	display: flex;
+	margin-bottom: 10px;
+	white-space: nowrap;
+	flex-wrap: nowrap;
+}
+
+.btn {
+  display: inline-block;
+  background-color: #4CAF50; /* Green background */
+  color: white;             /* White text */
+  padding: 2px 6px;        /* Small padding */
+  font-size: 0.85rem;       /* Small font size */
+  text-decoration: none;    /* Remove underline */
+  border-radius: 10px;       /* Rounded corners */
+  border: none;             /* No border */
+  cursor: pointer;          /* Pointer cursor on hover */
+  transition: background-color 0.3s ease;
+  margin-left: 10px;
+}
+
+.btn:hover,
+.btn:focus {
+  background-color: #45a049; /* Darker green on hover/focus */
+  outline: none;
+}
+
+.id {
+	display: inline-block;  /* or inline */
+	margin: 0 10px 0 0;    /* optional spacing */
+  	vertical-align: middle; /* align nicely */
+	flex-shrink: 0;
+}
+
+.date {
+	display: inline-block;  /* or inline */
+	margin: 0 10px 0 0;    /* optional spacing */
+  	vertical-align: middle; /* align nicely */
+	flex-shrink: 0;
+	
+}
+
+.title {
+	display: inline-block;  
+  	vertical-align: middle;
+	flex-grow: 1;
+	background: none;      
+  	border: none;          
+  	padding: 0;    
+    margin-right: 150px;        
+  	font: inherit;         
+  	color: inherit;         
+  	cursor: pointer;        
+    width: 150px; 
+    height: 50px;
+}
+
+.btns {
+	display: flex;
+	justify-content: center; 
+    cursor: pointer;
+}
+
+.cpbtn {
+	background-color: rgb(255, 123, 0);
+	color: white;
+	border: none;
+	margin-right: 10px;
+    width: 100px; /* Set a specific width */
+    height: 35px;
+
+}
+.sbtn {
+	background-color: rgb(60, 129, 188);
+	color: white;
+	border: none;
+    width: 100px; /* Set a specific width */
+    height: 35px;
+}
+
+.hidden {
+      display: none; 
+}
+
+.text-box {
+    border: 2px solid #333;
+    padding: 15px;            
+    background-color: #f9f9f9; 
+    width: fit-content;     
+    border-radius: 6px;      
+}
+
+.evbtn {
+    margin-left: 10px;
+}
+
+.input_name {
+    width: 300px;
+    height: 30px;
+}
+</style>
+
+<html>
+	<head>
+		<title>PIM labs Search-view</title>
+	</head>
+	<body>
+		<div>
+			<h1 class="pimtitle">PIM labs</h1>
+		</div>
+		<div class="input_block">
+			<input type="text" name="" id="search_box" class="input_name"> 
+		</div>
+		<div class="btns">
+			<button class="cpbtn">Create particle</button>
+			<button class="sbtn">Search</button>
+		</div>
+		<ul>
+		<article class="row-article"> <!--use this as a template for all search results via function-->
+			<span>
+				<p class="id">#0</p>
+				<time class="date" datetime="2025-08-13">2025-12-24</time>
+				<button class="title">Essay on the Modern Synthesis</button>
+				<p class="hidden" class="text-box">Contents that have been hidden in search view</p>
+				<button class="btn">View</button>
+				<button class="btn">Edit</button>
+            </span>
+		</article>
+		<article class="row-article">
+			<span>
+				<p class="id">#0</p>
+				<time class="date" datetime="2025-08-13">2025-12-24</time>
+				<button class="title">Variation and Mutation</button>
+				<button class="btn">View</button>
+				<button class="btn">Edit</button>
+			</span>
+		</article>
+		<article class="row-article">
+			<span>
+				<p class="id">#0</p>
+				<time class="date" datetime="2025-08-13">2025-12-24</time>
+				<button class="title">Mechanisms of Positive Selection</button>
+				<button class="btn">View</button>
+				<button class="btn">Edit</button>
+			</span>
+		</article>
+	</ul>
+</body>
+
+</html>
+</doctype>
