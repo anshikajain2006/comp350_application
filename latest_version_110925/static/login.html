@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+
+<style>
+
+h1 {
+    color: rgb(82, 82, 82);
+    /*font-family: Georgia, 'Times New Roman', Times, serif;*/
+}
+.center_wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    
+}
+
+.center_wrapper > * {
+    flex: 0 0 200px; /* don't grow, don't shrink, base width 200px */
+    margin: 10px;
+}
+
+.btn {
+    background-color: rgba(0, 149, 255, 0.707);
+    color: white;
+    border: none;
+    width: 100px;
+    height: 40px;
+    margin-left: 45px;
+    
+}
+
+.icon {
+    margin-top: 10px;
+}
+body {
+    font-size: 1.2em;
+    size: 10000;
+    height: 100vh;
+    display: flex;
+    justify-content: center; /* horizontal centering */
+    align-items: center;     /* vertical centering */
+}
+
+body > div {
+  width: 100%;       /* or a fixed width like 400px */
+  max-width: 400px;  /* limits container width */
+}
+
+.input_fields {
+    width: 300px; 
+    height: 50px;
+    overflow: hidden
+}
+
+input::placeholder {
+  font-size: 1.4em; /* Adjust this value as needed */
+}
+
+</style>
+
+<html>
+
+    <head>
+         <title>PIM Login</title> 
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    </head>
+
+    <body>
+        <div>
+            <div>
+                <h1 class="center_wrapper">PIM labs</h1>
+            </div>
+
+            <div class="center_wrapper" class="input_wrapper">
+                <span>
+                    <input type="text" name="Username" placeholder="Username" id="username" class="input_fields">
+                    <!-- <i class="material-icons" class="icon">person</i> -->
+                </span>
+            </div>
+
+            <div class="center_wrapper" class="input_wrapper">
+                <span>
+                    <input type="text" name="Password" placeholder="Password" id="password" class="input_fields">
+                    <!-- <i class="material-icons" class="icon">lock</i> -->
+                </span>
+            </div>
+
+            <div class="center_wrapper">
+                <span>
+                    <button class="btn">Sign in</button>
+                </span>
+            </div>
+        </div>
+    </body>
+</html>
+<script>
+
+</script>
+</html>
