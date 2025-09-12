@@ -1,11 +1,11 @@
 from __future__ import annotations
-from fastapi import FastAPI, Request, Response, HTTPException, status, Cookie, Depends
+from fastapi import FastAPI, Request, Response, HTTPException, status, Cookie, Depends, Query, File
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from dataclasses import dataclass, asdict
-from typing import Optional, Iterable, Annotated, Tuple, List
+from typing import Optional, Iterable, Annotated, Tuple, List, Any
 import os
 import hmac
 import uuid
@@ -18,6 +18,9 @@ from datetime import datetime, timedelta
 import auth_module as auth
 import particle_module as part
 import storage_module as stor
+
+# SQL Configuration
+db_file = "pim.db"
 
 app = FastAPI()
 
@@ -59,9 +62,8 @@ con.execute("PRAGMA foreign_keys = ON")
 con.execute("""
 CREATE TABLE IF NOT EXISTS Users(
   user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username TEXT UNIQUE,
-  -- legacy plaintext column (kept temporarily):
-  password TEXT,
+  username TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
   password_salt TEXT,
   password_hash TEXT
 );
@@ -70,12 +72,12 @@ CREATE TABLE IF NOT EXISTS Users(
 con.execute("""
 CREATE TABLE IF NOT EXISTS Particles(
   particle_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  date_created TEXT,
-  date_updated TEXT,
+  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   title TEXT,
-  body TEXT,
-  tags TEXT,
-  particle_references TEXT
+  body TEXT NOT NULL,
+  tags TEXT DEFAULT [],
+  particle_references TEXT DEFAULT []
 );
 """)
 
@@ -101,7 +103,17 @@ CREATE TABLE IF NOT EXISTS FailedLogins(
 """)
 
 con.commit()
+con.close()
 
+def get_db_con():
+    """
+    Connects to the database and allows the user to access the 
+    database.
+
+    """
+    con = sqlite3.connect(DATABASE_FILE)
+    con.row_factory = sqlite3.Row  # This enables column access by name
+    return con
 
 @dataclass
 class User(BaseModel):
@@ -175,14 +187,15 @@ server_secret_key = secrets.token_bytes(nbytes=32)
 def sign(text: str):
     return auth.sign(text)
 
-class LoginRequest(BaseModel): #replace with Credentials? same thing
-    username: str
-    password: str
-
-@app.post("/login") 
-async def handler_login(data: LoginRequest,  *, user_agent: Optional[str] = None, ip: Optional[str] = None):
-    return auth.login(data.username, data.password, user_agent=None, ip=None)
-
+@app.post("/auth/login") 
+async def handler_login(data: Credentials, user_agent: Optional[str] = None, ip: Optional[str] = None):
+    user = auth.login(data.username, data.password, user_agent=None, ip=None)
+    if not user or not handler_verify_password(data.password, user[1]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="The username or password is incorrect"
+        )
+    return user
 @app.put("/")
 def handler_logout(session_token: str):
     return auth.logout(session_token)
@@ -278,8 +291,8 @@ def do_logout(session: Annotated[Optional[str], Cookie(alias=COOKIE_NAME)] = Non
     return resp
 
 # Example of a state-changing endpoint protected by CSRF + cookie session
-@app.post("/note", dependencies=[Depends(handler_csrf_protect)])
-def create_note(payload: dict,
+@app.post("/particles", dependencies=[Depends(handler_csrf_protect)])
+def create_particle(payload: dict,
                 session: Annotated[Optional[str], Cookie(alias=COOKIE_NAME)] = None):
     if not session:
         raise HTTPException(401, detail="Unauthorized")
