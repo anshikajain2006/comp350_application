@@ -92,7 +92,7 @@ class ParticleManager:
     :type db_path: str, optional
     """
 
-    _ALLOWED_SORT = {"date_updated", "date_created", "title"}
+    ALLOWED_SORT = {"date_updated", "date_created", "title"}
 
     def __init__(self, db_path: str = "pim.db"):
         self.db_path = db_path
