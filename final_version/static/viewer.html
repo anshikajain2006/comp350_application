@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIM Particle Viewer</title>
+    <style>
+
+.back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: #785EF0;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+.back-btn:hover {
+    background-color: #6f57dd;
+}
+
+.edit_btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #FFB000;
+    color: white;
+    padding: 8px 20px;
+    font-size: 0.9em;
+    text-decoration: none;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.edit_btn:hover {
+    background-color: #e89e00;
+}
+
+h3 {
+    position: absolute;
+    top: 35px;
+    left: 300px;
+    font-size: xx-large;
+}
+
+.id {
+    display: inline-block;
+    margin: 0 10px 0 0;
+}
+
+.title {
+    display: inline-block;
+    margin-left: 15px;
+    font-weight: bold;
+}
+
+.hashtag {
+    position: relative;
+    left: -30px;
+    top: 890px;
+    display: inline-block;
+    background-color: #666A86;
+    color: white;
+    padding: 2px 6px;
+    font-size: 0.95rem;
+    text-decoration: none;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 2px;
+}
+
+.hashtag:hover {
+    background-color: #545773;
+}
+
+.particle-ref {
+    position: relative;
+    left: -30px;
+    top: 890px;
+    display: inline-block;
+    background-color: #E8DDB5;
+    color: rgb(0, 0, 0);
+    padding: 2px 6px;
+    font-size: 0.95rem;
+    text-decoration: none;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 2px;
+}
+
+.particle-ref:hover {
+    background-color: #d4c89a;
+}
+
+.top_elements {
+    position: absolute;
+    top: 100px;
+    left: 250px;
+    font-size: larger;
+}
+
+.inner_contents {
+    background-color: #ffffff;
+    width: 8.5in;
+    max-width: 90%;
+    min-height: 10in;
+    height: fit-content;
+    margin: 20px auto;
+    padding: 1in;
+    box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.1),
+        0 6px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    position: relative;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+}
+
+.contents {
+    position: relative;
+    top: 50px;
+    font-size: larger;
+    max-width: 90%;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.loading {
+    text-align: center;
+    margin: 50px 0;
+}
+
+.error {
+    color: red;
+    text-align: center;
+    margin: 50px 0;
+}
+
+.tags-refs-container {
+    margin-top: 900px;
+    margin-left: -30px;
+}
+    </style>
+</head>
+<body class="inner_contents">
+    <button class="back-btn" onclick="goBack()">← Back to Search</button>
+    
+    <button class="edit_btn" id="edit-button">Edit</button>
+    
+    <div class="separate">
+        <h3>Particle Viewer</h3>
+    </div>
+    
+    <div id="loading" class="loading">Loading particle...</div>
+    <div id="error" class="error" style="display: none;"></div>
+    
+    <div id="particle-content" style="display: none;">
+        <div class="details">
+            <article>
+                <div class="top_elements">
+                    <span>
+                        <p class="id" id="particle-id">Loading...</p>
+                        <time class="date" id="particle-date">Loading...</time>
+                        <p class="title" id="particle-title">Loading...</p>
+                    </span>
+                </div>
+            </article>
+
+            <div>
+                <p class="contents" id="particle-body">Loading content...</p>
+            </div>
+
+            <div class="tags-refs-container">
+                <span id="tags-container"></span>
+                <span id="refs-container"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+
+        function getParticleId() {
+        /**
+         * Retrieve the particle id from the current URL query string.
+         *
+         * :returns: {string|null} The particle id if present, otherwise null.
+         */
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        function goBack() {
+        /**
+         * Navigate back to the search page.
+         *
+         * :returns: {void}
+         */
+            window.location.href = '/search';
+        }
+
+        async function loadParticle(particleId) {
+        /**
+         * Load a particle by id from the backend and render it in the viewer.
+         *
+         * :param {string} particleId: UUID of the particle to fetch.
+         * :returns: {Promise<void>}
+         */
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const content = document.getElementById('particle-content');
+
+            try {
+                const response = await fetch(`${API_BASE}/particles/${particleId}`, {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/';
+                        return;
+                    }
+                    throw new Error('Particle not found');
+                }
+
+                const particle = await response.json();
+                
+                // hides loading
+                loading.style.display = 'none';
+                content.style.display = 'block';
+
+                // provides particle data
+                document.getElementById('particle-id').textContent = `#${particle.id.substring(0, 8)}`;
+                document.getElementById('particle-date').textContent = new Date(particle.date_created).toLocaleDateString();
+                document.getElementById('particle-title').textContent = particle.title || 'Untitled';
+                document.getElementById('particle-body').textContent = particle.body || 'No content';
+
+                // edit button
+                document.getElementById('edit-button').onclick = () => {
+                    window.location.href = `/editor?id=${particleId}`;
+                };
+
+                // renders tags
+                const tagsContainer = document.getElementById('tags-container');
+                if (particle.tags && particle.tags.length > 0) {
+                    tagsContainer.innerHTML = particle.tags.map(tag => 
+                        `<button class="hashtag" onclick="searchByTag('${tag}')">#${tag}</button>`
+                    ).join('');
+                } else {
+                    tagsContainer.innerHTML = '';
+                }
+
+                // renders particle refs
+                const refsContainer = document.getElementById('refs-container');
+                if (particle.particle_references && particle.particle_references.length > 0) {
+                    refsContainer.innerHTML = particle.particle_references.map(ref => 
+                        `<button class="particle-ref" onclick="viewParticleRef('${ref}')">#${ref.substring(0, 8)}</button>`
+                    ).join('');
+                } else {
+                    refsContainer.innerHTML = '';
+                }
+
+            } catch (err) {
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.textContent = err.message;
+            }
+        }
+
+        // search for a particle by tag
+        function searchByTag(tag) {
+        /**
+         * Jump to the search page filtered by a given tag.
+         *
+         * :param {string} tag: Tag value (no leading '#').
+         * :returns: {void}
+         */
+            window.location.href = `/search?query=%23${tag}`;
+        }
+
+        function viewParticleRef(particleId) {
+        /**
+         * Navigate to view a referenced particle by id.
+         *
+         * :param {string} particleId: UUID of the referenced particle.
+         * :returns: {void}
+         */
+            window.location.href = `/viewer?id=${particleId}`;
+        }
+
+        // Handles the inputs and loads relevant particle
+        document.addEventListener('DOMContentLoaded', function() {
+            const particleId = getParticleId();
+            if (!particleId) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'No particle ID specified';
+                return;
+            }
+
+            loadParticle(particleId);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIM Particle Editor</title>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+    <style>
+        body {
+            font-size: 1.2em;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #45a049;
+        }
+
+        body > div.container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .editor-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .id {
+            font-weight: bold;
+            color: #666;
+        }
+
+        .date {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .view_btn, .save_btn, .delete_btn {
+            color: white;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            text-decoration: none;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .view_btn {
+            background-color: #785EF0;
+        }
+
+        .save_btn {
+            background-color: #648FFF;
+            margin-left: 10px;
+        }
+
+        .delete_btn {
+            background-color: #DC267F;
+            margin-left: 10px;
+        }
+
+        .view_btn:hover,
+        .save_btn:hover,
+        .delete_btn:hover {
+            opacity: 0.8;
+        }
+
+        .hashtag {
+            display: inline-block;
+            background-color: #785EF0;
+            color: white;
+            padding: 2px 6px;
+            font-size: 0.85rem;
+            text-decoration: none;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 2px;
+        }
+
+        .hashtag:hover {
+            background-color: rgb(91, 2, 91);
+        }
+
+        .particle-ref {
+            display: inline-block;
+            background-color: #DC267F;
+            color: white;
+            padding: 2px 6px;
+            font-size: 0.85rem;
+            text-decoration: none;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 2px;
+        }
+
+        .particle-ref:hover {
+            background-color: rgb(160, 45, 3);
+        }
+
+        .box {
+            border: 2px solid #333;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 1000px;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        #title_editor {
+            margin-bottom: 20px;
+            min-height: 50px;
+        }
+
+        #editor {
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .ql-toolbar {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .ql-container {
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .error {
+            color: #DC267F;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .success {
+            color: green;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .tags-refs-display {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Custom placeholder styling for Quill when empty */
+        .ql-editor.ql-blank::before {
+            font-style: italic;
+            color: #000000;
+        }
+
+        /* Delete Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h4 {
+            margin: 0;
+            color: #333;
+            font-size: 1.3em;
+        }
+
+        .modal-body {
+            margin-bottom: 30px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+            min-width: 80px;
+        }
+
+        .modal-btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .modal-btn-cancel:hover {
+            background-color: #5a6268;
+        }
+
+        .modal-btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .modal-btn-delete:hover {
+            background-color: #c82333;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="goBack()">← Back to Search</button>
+    
+    <div class="container">
+        <h3 id="page-title">Particle Editor</h3>
+        
+        <div id="loading" class="loading" style="display: none;">Loading...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        <div id="success" class="success" style="display: none;"></div>
+        
+        <div class="box" id="editor-container">
+            <article>
+                <div class="editor-header">
+                    <span class="id" id="particle-id">#new</span>
+                    <time class="date" id="particle-date"></time>
+                    <div style="flex-grow: 1;"></div>
+                    <button class="view_btn" id="view-btn" style="display: none;" onclick="viewParticle()">View</button>
+                    <button class="save_btn" onclick="saveParticle()">Save</button>
+                    <button class="delete_btn" id="delete-btn" style="display: none;" onclick="showDeleteModal()">Delete</button>
+                </div>
+                
+                <div id="title_editor"></div>
+                <div id="editor"></div>
+            </article>
+            
+            <div class="tags-refs-display">
+                <div id="tags-container"></div>
+                <div id="refs-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Delete Particle</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this particle?</p>
+                <p><strong>This action cannot be undone.</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" onclick="hideDeleteModal()">Cancel</button>
+                <button class="modal-btn modal-btn-delete" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <script>
+        const API_BASE = '';
+        let currentParticleId = null;
+        let titleQuill, contentQuill;
+
+        function initializeEditors() {
+        /**
+         * Initialize Quill editors for title and content, attach toolbars and listeners.
+         *
+         * :returns: {void} Sets up titleQuill and contentQuill globals and hooks tag/reference extraction.
+         */    
+            // Only initialize if editors don't already exist
+            if (titleQuill || contentQuill) {
+                return;
+            }
+
+            titleQuill = new Quill('#title_editor', {
+                theme: 'snow',
+                placeholder: 'Title',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline']
+                    ]
+                }
+            });
+
+            contentQuill = new Quill('#editor', {
+                theme: 'snow',
+                placeholder: 'Content',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'script': 'sub'}, { 'script': 'super' }],
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],
+                        ['link', 'image'],
+                        ['clean']
+                    ]
+                }
+            });
+
+            // Clear any default content that Quill might add
+            titleQuill.setText('');
+            contentQuill.setText('');
+
+            contentQuill.on('text-change', debounce(updateTagsAndRefs, 500));
+        }
+
+        function debounce(func, wait) {
+        /**
+         * Debounce function to limit how often a function can be called.
+         *
+         * :param {Function} func: The function to debounce.
+         * :param {number} wait: The number of milliseconds to delay.
+         * :returns: {Function} The debounced function.
+         */    
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function updateTagsAndRefs() {
+        /**
+         * Extract tags and references from editor content and display them.
+         *
+         * :returns: {void} Updates the tags and references UI containers.
+         */
+            const content = contentQuill.getText();
+            const tags = extractTags(content);
+            const refs = extractReferences(content);
+            
+            displayTags(tags);
+            displayReferences(refs);
+        }
+
+        function extractTags(content) {
+        /**
+         * Extract hashtag-style tags from text content, e.g., "#tag".
+         *
+         * :param {string} content: The text content to scan.
+         * :returns: {string[]} Sorted list of unique tags (without '#').
+         */
+            const tagRegex = /#([A-Za-z][A-Za-z0-9_-]*)/g;
+            const tags = [];
+            let match;
+            while ((match = tagRegex.exec(content)) !== null) {
+                if (!tags.includes(match[1])) {
+                    tags.push(match[1]);
+                }
+            }
+            return tags.sort();
+        }
+
+        function extractReferences(content) {
+        /**
+         * Extract particle references from text content (UUIDs or numeric #refs).
+         *
+         * :param {string} content: The text content to scan.
+         * :returns: {string[]} List of unique references (UUIDs or numeric strings).
+         */
+            const uuidRegex = /\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b/g;
+            const numRefRegex = /#(\d+)/g;
+            
+            const uuids = [];
+            const numRefs = [];
+            
+            let match;
+            while ((match = uuidRegex.exec(content)) !== null) {
+                if (!uuids.includes(match[0])) {
+                    uuids.push(match[0]);
+                }
+            }
+            
+            while ((match = numRefRegex.exec(content)) !== null) {
+                if (!numRefs.includes(match[1])) {
+                    numRefs.push(match[1]);
+                }
+            }
+            
+            return uuids.length > 0 ? uuids : numRefs;
+        }
+
+        function displayTags(tags) {
+        /**
+         * Render tags as buttons in the tags container.
+         *
+         * :param {string[]} tags: A list of tag names (without '#').
+         * :returns: {void}
+         */
+            const container = document.getElementById('tags-container');
+            container.innerHTML = tags.map(tag => 
+                `<span class="hashtag">#${tag}</span>`
+            ).join('');
+        }
+
+        function displayReferences(refs) {
+        /**
+         * Render particle references as buttons in the refs container.
+         *
+         * :param {string[]} refs: A list of reference identifiers (UUIDs or numbers).
+         * :returns: {void}
+         */
+            const container = document.getElementById('refs-container');
+            container.innerHTML = refs.map(ref => 
+                `<span class="particle-ref">#${ref.substring ? ref.substring(0, 8) : ref}</span>`
+            ).join('');
+        }
+
+        function getParticleId() {
+        /**
+         * Retrieve the particle id from the current page URL query parameters.
+         *
+         * :returns: {string|null} The particle id if present, otherwise null.
+         */
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        async function loadParticle(particleId) {
+        /**
+         * Load an existing particle by id and populate the editor fields.
+         *
+         * :param {string} particleId: The UUID of the particle to load.
+         * :returns: {Promise<void>} Resolves after UI is updated or error displayed.
+         */
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            
+            loading.style.display = 'block';
+            
+            try {
+                const response = await fetch(`${API_BASE}/particles/${particleId}`, {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/';
+                        return;
+                    }
+                    throw new Error('Particle not found');
+                }
+
+                const particle = await response.json();
+                
+                // updating editors
+                titleQuill.setText(particle.title || '');
+                contentQuill.setText(particle.body || '');
+                
+                // sets title of the page
+                document.getElementById('particle-id').textContent = `#${particle.id.substring(0, 8)}`;
+                
+                // Converting UTC to IST
+                const utcDate = new Date(particle.date_updated);
+                const istDate = new Date(utcDate.getTime() + (5.5 * 60 * 60 * 1000)); // Add 5.5 hours for IST
+                document.getElementById('particle-date').textContent = istDate.toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+                
+                document.getElementById('view-btn').style.display = 'inline-block';
+                document.getElementById('delete-btn').style.display = 'inline-block';
+                
+                updateTagsAndRefs();
+                
+            } catch (err) {
+                error.style.display = 'block';
+                error.textContent = err.message;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        async function saveParticle() {
+        /**
+         * Save the current particle (create or update) via API.
+         *
+         * :returns: {Promise<void>} Resolves after showing success or error state.
+         */
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const success = document.getElementById('success');
+            
+            // clearing old messages
+            error.style.display = 'none';
+            success.style.display = 'none';
+            loading.style.display = 'block';
+
+            const title = titleQuill.getText().trim();
+            const body = contentQuill.getText().trim();
+
+            if (!body) {
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.textContent = 'Content cannot be empty';
+                return;
+            }
+
+            try {
+                let response;
+                
+                if (currentParticleId) {
+                    // updates existing particle
+                    response = await fetch(`${API_BASE}/particles/${currentParticleId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ title, body }),
+                        credentials: 'include'
+                    });
+                } else {
+                    // creating new particle
+                    response = await fetch(`${API_BASE}/particles`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ title, body }),
+                        credentials: 'include'
+                    });
+                }
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/';
+                        return;
+                    }
+                    throw new Error('Failed to save particle');
+                }
+
+                const particle = await response.json();
+                
+                // Updating UI for to account for the new particle
+                if (!currentParticleId) {
+                    currentParticleId = particle.id;
+                    document.getElementById('particle-id').textContent = `#${particle.id.substring(0, 8)}`;
+                    document.getElementById('view-btn').style.display = 'inline-block';
+                    document.getElementById('delete-btn').style.display = 'inline-block';
+
+                    // Update URL without page reload
+                    window.history.replaceState({}, '', `/editor?id=${particle.id}`);
+                }
+                
+                // Converting UTC to IST
+                const utcDate = new Date(particle.date_updated);
+                const istDate = new Date(utcDate.getTime() + (5.5 * 60 * 60 * 1000)); // Add 5.5 hours for IST
+                document.getElementById('particle-date').textContent = istDate.toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+                
+                success.style.display = 'block';
+                success.textContent = 'Particle saved successfully!';
+                
+                setTimeout(() => {
+                    success.style.display = 'none';
+                }, 3000);
+                
+            } catch (err) {
+                error.style.display = 'block';
+                error.textContent = err.message;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function showDeleteModal() {
+        /**
+         * Show the delete confirmation modal.
+         *
+         * :returns: {void}
+         */
+            const modal = document.getElementById('deleteModal');
+            modal.classList.add('show');
+        }
+
+        function hideDeleteModal() {
+        /**
+         * Hide the delete confirmation modal.
+         *
+         * :returns: {void}
+         */
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('show');
+        }
+
+        async function confirmDelete() {
+        /**
+         * Delete the current particle after confirmation.
+         *
+         * :returns: {Promise<void>} Resolves after deletion or error display.
+         */
+            if (!currentParticleId) return;
+
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            
+            hideDeleteModal();
+            loading.style.display = 'block';
+            error.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_BASE}/particles/${currentParticleId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/';
+                        return;
+                    }
+                    throw new Error('Failed to delete particle');
+                }
+
+                // Redirect to search page after successful deletion
+                window.location.href = '/search';
+                
+            } catch (err) {
+                error.style.display = 'block';
+                error.textContent = err.message;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function viewParticle() {
+        /**
+         * Navigate to the viewer page for the current particle, if any.
+         *
+         * :returns: {void}
+         */
+            if (currentParticleId) {
+                window.location.href = `/viewer?id=${currentParticleId}`;
+            }
+        }
+
+        function goBack() {
+        /**
+         * Navigate back to the search page.
+         *
+         * :returns: {void}
+         */
+            window.location.href = '/search';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('deleteModal');
+            if (event.target === modal) {
+                hideDeleteModal();
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                hideDeleteModal();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize editors only once
+            initializeEditors();
+            
+            const particleId = getParticleId();
+            if (particleId) {
+                currentParticleId = particleId;
+                loadParticle(particleId);
+            } else {
+                // For new particle, show current IST time
+                const now = new Date();
+                const istTime = new Date(now.getTime() + (5.5 * 60 * 60 * 1000)); // Add 5.5 hours for IST
+                document.getElementById('particle-date').textContent = istTime.toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+                
+                // rechecks and initializes editors
+                if (titleQuill && contentQuill) {
+                    titleQuill.setText('');
+                    contentQuill.setText('');
+                    updateTagsAndRefs();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

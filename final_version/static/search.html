@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIM labs Search-view</title>
+  <style>
+    body {
+      font-size: 1.2em;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding-top: 60px;
+      margin: 0;
+    }
+
+    body > div {
+      width: 100%;
+      max-width: 800px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .logout-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #DC267F;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: background-color 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background-color: #c2216f;
+    }
+
+    .input_block {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .row-article {
+      align-items: flex-start;
+      gap: 8px;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+
+    .article-header {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: 10px;
+    }
+
+    .article-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    .metadata-buttons {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex-wrap: wrap;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: #785EF0;
+      color: white;
+      padding: 4px 8px;
+      font-size: 0.85rem;
+      text-decoration: none;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-left: 5px;
+    }
+
+    .btn:hover,
+    .btn:focus {
+      background-color: #6f57dd;
+      outline: none;
+    }
+
+    .btn.delete-btn {
+      background-color: #DC267F;
+    }
+
+    .btn.delete-btn:hover {
+      background-color: #cc2375;
+    }
+
+    .id {
+      margin-right: 8px;
+      font-weight: bold;
+    }
+
+    .date {
+      margin-right: 8px;
+      font-size: 0.85em;
+      color: #666;
+    }
+
+    .title {
+      flex-grow: 1;
+      background: none;
+      border: none;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .tags-container {
+      margin: 5px 0;
+    }
+
+    .tags-label {
+      font-size: 0.8em;
+      color: #666;
+      font-weight: 500;
+      margin-right: 8px;
+    }
+
+    .tag {
+      display: inline-block;
+      background-color: #e3f2fd;
+      color: #648FFF;
+      padding: 2px 6px;
+      margin: 1px 2px;
+      border-radius: 12px;
+      font-size: 0.7em;
+      border: 1px solid #bbdefb;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tag:hover {
+      background-color: #5e86eb;
+      transform: translateY(-1px);
+    }
+
+    .references-container {
+      margin: 5px 0;
+    }
+
+    .references-label {
+      font-size: 0.8em;
+      color: #666;
+      font-weight: 500;
+      margin-right: 8px;
+    }
+
+    .particle-ref {
+      display: inline-block;
+      background-color: #f3e5f5;
+      color: #6f1c92;
+      padding: 2px 6px;
+      margin: 1px 2px;
+      border-radius: 12px;
+      font-size: 0.7em;
+      border: 1px solid #e1bee7;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .particle-ref:hover {
+      background-color: #681a89;
+      transform: translateY(-1px);
+    }
+
+    .no-tags, .no-references {
+      font-size: 0.75em;
+      color: #999;
+      font-style: italic;
+      padding: 4px 8px;
+    }
+
+    .btns {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .cpbtn {
+      background-color: #FE6100;
+      color: white;
+      border: none;
+      cursor: pointer;
+      width: 120px;
+      height: 35px;
+      border-radius: 5px;
+    }
+
+    .cpbtn:hover {
+      background-color: #ec5c03;
+    }
+
+    .sbtn {
+      background-color: #648FFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+      width: 100px;
+      height: 35px;
+      border-radius: 5px;
+    }
+
+    .sbtn:hover {
+      background-color: #5e86eb;
+;
+    }
+
+    .input_name {
+      width: 300px;
+      height: 30px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    .particles-container {
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .loading {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .no-results {
+      text-align: center;
+      color: #666;
+      margin: 20px 0;
+    }
+
+    .pagination {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .pagination button {
+      margin: 0 5px;
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: #f0f0f0;
+    }
+
+    .pagination button.active {
+      background: #4CAF50;
+      color: white;
+    }
+
+    /* Simple error message styling */
+    .error-message {
+      background-color: #ffebee;
+      border: 1px solid #f44336;
+      color: #d32f2f;
+      padding: 12px;
+      border-radius: 5px;
+      margin: 10px 0;
+      text-align: center;
+      display: none;
+    }
+
+    /* Dialog Element Styling */
+    #delete-dialog {
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      padding: 0;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    #delete-dialog::backdrop {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .dialog-content {
+      padding: 30px;
+      text-align: center;
+    }
+
+    .dialog-header {
+      margin-bottom: 15px;
+    }
+
+    .dialog-header h3 {
+      margin: 0;
+      color: #333;
+      font-size: 1.3em;
+    }
+
+    .dialog-body {
+      margin-bottom: 25px;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .dialog-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: background-color 0.3s ease;
+      min-width: 80px;
+    }
+
+    .dialog-btn-cancel {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .dialog-btn-cancel:hover {
+      background-color: #5a6268;
+    }
+
+    .dialog-btn-delete {
+      background-color: #DC267F;
+      color: white;
+    }
+
+    .dialog-btn-delete:hover {
+      background-color: #cc2375;
+    }
+
+  </style>
+</head>
+<body>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+  
+  <div>
+    <h1 class="pimtitle">PIM labs</h1>
+  </div>
+  
+  <div class="input_block">
+    <input type="text" id="search_box" class="input_name"
+           placeholder="Search particles..."
+           onkeypress="handleSearchKeyPress(event)">
+  </div>
+  
+  <div class="btns">
+    <button class="cpbtn" onclick="createNewParticle()">Create particle</button>
+    <button class="sbtn" onclick="searchParticles()">Search</button>
+  </div>
+  
+  <div class="particles-container">
+    <div id="loading" class="loading" style="display: none;">Loading...</div>
+    <div id="error-message" class="error-message"></div>
+    <div id="no-results" class="no-results" style="display: none;">No particles found</div>
+    <div id="particles-list"></div>
+    <div id="pagination" class="pagination"></div>
+  </div>
+
+  <!-- Delete Confirmation Dialog -->
+  <dialog id="delete-dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h3>Confirm Delete</h3>
+      </div>
+      <div class="dialog-body">
+        <p>Are you sure you want to delete this particle?</p>
+        <p><strong>This action cannot be undone.</strong></p>
+      </div>
+      <div class="dialog-footer">
+        <button class="dialog-btn dialog-btn-cancel" onclick="closeDeleteDialog()">Cancel</button>
+        <button class="dialog-btn dialog-btn-delete" onclick="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+
+const API_BASE = '';
+let currentPage = 1;
+let currentQuery = '';
+let currentFuzzy = 0; // 0 = exact, 1 = fuzzy
+let deleteParticleId = null; // Store ID of particle to delete
+const pageSize = 10;
+
+async function checkAuth() {
+  /**
+ * Check if the user is authenticated by probing the API.
+ *
+ * :returns: {Promise<boolean>} True if authenticated, false otherwise.
+ */
+    try {
+        const response = await fetch(`${API_BASE}/particles/count`, {
+            credentials: 'include'
+        });
+        if (response.status === 401) {
+            window.location.href = '/';
+            return false;
+        }
+        return response.ok;
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        return false;
+    }
+}
+
+async function logout() {
+  /**
+ * Log out the user and redirect to login page.
+ *
+ * :returns: {Promise<void>}
+ */
+    try {
+        await fetch(`${API_BASE}/auth/logout`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+    } catch (error) {
+        console.error('Logout error:', error);
+    } finally {
+        window.location.href = '/';
+    }
+}
+
+function createNewParticle() {
+   /**
+ * navigates to editor
+ *
+ * :returns: {Promise<void>}
+ */
+    window.location.href = '/editor';
+}
+
+function viewParticle(particleId) {
+    /**
+ * navigates to viewer
+ *
+ * :returns: {Promise<void>}
+ */
+    window.location.href = `/viewer?id=${particleId}`;
+}
+
+function editParticle(particleId) {
+    /**
+ * navigates to editor
+ *
+ * :returns: {Promise<void>}
+ */
+    window.location.href = `/editor?id=${particleId}`;
+}
+
+function searchByTag(tag) {
+    /**
+ * Search particles by a specific tag
+ *
+ * :param {string} tag: Tag to search for
+ * :returns: {void}
+ */
+    document.getElementById('search_box').value = `#${tag}`;
+    searchParticles();
+}
+
+function viewParticleRef(particleId) {
+    /**
+ * Navigate to view a referenced particle
+ *
+ * :param {string} particleId: UUID of the referenced particle
+ * :returns: {void}
+ */
+    viewParticle(particleId);
+}
+
+function deleteParticle(particleId) {
+/**
+ * Show delete confirmation dialog for a particle.
+ *
+ * :param {string} particleId: UUID of the particle to delete.
+ * :returns: {void}
+ */
+    deleteParticleId = particleId;
+    const dialog = document.getElementById('delete-dialog');
+    dialog.showModal();
+}
+
+function closeDeleteDialog() {
+/**
+ * Close the delete confirmation dialog.
+ *
+ * :returns: {void}
+ */
+    const dialog = document.getElementById('delete-dialog');
+    dialog.close();
+    deleteParticleId = null;
+}
+
+function confirmDelete() {
+/**
+ * Confirm and execute the deletion of the selected particle.
+ *
+ * :returns: {void}
+ */
+    if (deleteParticleId) {
+        executeDelete(deleteParticleId);
+        closeDeleteDialog();
+    }
+}
+
+// Close dialog when clicking on backdrop or pressing Escape (built-in dialog behavior)
+document.getElementById('delete-dialog').addEventListener('cancel', function(event) {
+    // This event fires when user presses Escape or clicks backdrop
+    closeDeleteDialog();
+});
+
+async function executeDelete(particleId) {
+/**
+ * Execute the actual deletion of a particle.
+ *
+ * :param {string} particleId: UUID of the particle to delete.
+ * :returns: {Promise<void>}
+ */
+    const errorDiv = document.getElementById('error-message');
+    errorDiv.style.display = 'none';
+    
+    try {
+        const response = await fetch(`${API_BASE}/particles/${particleId}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                window.location.href = '/';
+                return;
+            }
+            throw new Error('Failed to delete particle');
+        }
+        
+        // reloading particles post search
+        if (currentQuery) {
+            loadParticles(currentQuery, currentPage, currentFuzzy);
+        } else {
+            loadParticles('', currentPage, 0);
+        }
+        
+    } catch (error) {
+        errorDiv.textContent = 'Error deleting particle. Please try again.';
+        errorDiv.style.display = 'block';
+        console.error('Delete error:', error);
+    }
+}
+
+function searchParticles() {
+/**
+ * Trigger a new search. Always starts with exact search;
+ * if 0 results, loadParticles() will retry with fuzzy=1.
+ *
+ * :returns: {void}
+ */
+    const query = document.getElementById('search_box').value.trim();
+    currentQuery = query;
+    currentPage = 1;
+    currentFuzzy = 0; // reset to exact
+    const errorDiv = document.getElementById('error-message');
+    errorDiv.style.display = 'none';
+    errorDiv.textContent = '';
+    loadParticles(query, 1, 0);
+}
+
+function handleSearchKeyPress(event) {
+    if (event.key === 'Enter') searchParticles();
+}
+
+
+async function loadParticles(query = '', page = 1, fuzzy = currentFuzzy) {
+/**
+ * Load particles from backend. If fuzzy=0 and no results, will retry with fuzzy=1.
+ *
+ * :param {string} [query=""]: Search string.
+ * :param {number} [page=1]: Page number.
+ * :param {number} [fuzzy=currentFuzzy]: Fuzzy mode flag (0 or 1).
+ * :returns: {Promise<void>}
+ */
+    const loading = document.getElementById('loading');
+    const noResults = document.getElementById('no-results');
+    const particlesList = document.getElementById('particles-list');
+    const errorDiv = document.getElementById('error-message');
+
+    loading.style.display = 'block';
+    noResults.style.display = 'none';
+    errorDiv.style.display = 'none';
+    errorDiv.textContent = '';
+    particlesList.innerHTML = '';
+
+    try {
+        let url = `${API_BASE}/particles?page=${page}&page_size=${pageSize}`;
+        if (query) url += `&query=${encodeURIComponent(query)}`;
+        if (fuzzy) url += `&fuzzy=1`;
+
+        const response = await fetch(url, { credentials: 'include' });
+
+        if (!response.ok) {
+            if (response.status === 401) { 
+                window.location.href = '/'; 
+                return; 
+            }
+            throw new Error('Failed to load particles');
+        }
+
+        const data = await response.json();
+        loading.style.display = 'none';
+
+        if (!fuzzy && query && data.particles.length === 0) {
+            currentFuzzy = 1;
+            errorDiv.textContent = 'No exact matches — showing fuzzy matches instead.';
+            errorDiv.style.display = 'block';
+            return loadParticles(query, 1, 1);
+        }
+
+        if (data.particles.length === 0) {
+            noResults.style.display = 'block';
+            document.getElementById('pagination').innerHTML = '';
+            return;
+        }
+
+        renderParticles(data.particles);
+        renderPagination(data);
+        currentPage = data.page;
+        currentFuzzy = fuzzy;
+    } catch (err) {
+        loading.style.display = 'none';
+        errorDiv.textContent = 'Error loading particles. Please try again.';
+        errorDiv.style.display = 'block';
+        console.error(err);
+    }
+}
+
+function renderParticles(particles) {
+    const list = document.getElementById('particles-list');
+    list.innerHTML = particles.map(p => {
+        // Debug: log the particle structure to see what fields are available
+        console.log('Particle data:', p);
+        
+        // Try multiple possible field names for tags and references
+        const tags = p.tags || p.tag_list || p.particle_tags || [];
+        const references = p.particle_references || p.references || p.refs || p.linked_particles || p.connections || [];
+        
+        // Debug: log what we found
+        console.log('Tags found:', tags);
+        console.log('References found:', references);
+        
+        const tagsHtml = renderTagsInline(tags);
+        const referencesHtml = renderReferencesInline(references);
+        
+        return `
+        <article class="row-article">
+            <div class="article-header">
+                <p class="id">#${p.id.substring(0,8)}</p>
+                <time class="date">${new Date(p.date_created).toLocaleDateString()}</time>
+                <button class="title" onclick="viewParticle('${p.id}')">${escapeHtml(p.title || 'Untitled')}</button>
+            </div>
+            <div class="article-actions">
+                <div class="metadata-buttons">
+                    ${tagsHtml}
+                    ${referencesHtml}
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" onclick="viewParticle('${p.id}')">View</button>
+                    <button class="btn" onclick="editParticle('${p.id}')">Edit</button>
+                    <button class="btn delete-btn" onclick="deleteParticle('${p.id}')">Delete</button>
+                </div>
+            </div>
+        </article>
+    `;
+    }).join('');
+}
+
+function renderTagsInline(tags) {
+    // Handle case where tags might not exist in API response yet
+    if (!tags || !Array.isArray(tags) || tags.length === 0) {
+        return ''; // Don't show anything if no tags
+    }
+    
+    try {
+        const tagsHtml = tags.map(tag => {
+            // Handle both string tags and object tags
+            const tagValue = typeof tag === 'string' ? tag : (tag.name || tag.tag || String(tag));
+            return `<span class="tag" onclick="searchByTag('${escapeHtml(tagValue)}')">#${escapeHtml(tagValue)}</span>`;
+        }).join('');
+        
+        return tagsHtml;
+    } catch (error) {
+        console.error('Error rendering tags:', error);
+        return '';
+    }
+}
+
+function renderReferencesInline(references) {
+    // Debug logging
+    console.log('renderReferencesInline called with:', references);
+    
+    // Handle case where references might not exist in API response yet
+    if (!references) {
+        console.log('No references field found');
+        return '';
+    }
+    
+    if (!Array.isArray(references)) {
+        console.log('References is not an array:', typeof references, references);
+        return '';
+    }
+    
+    if (references.length === 0) {
+        console.log('References array is empty');
+        return '';
+    }
+    
+    try {
+        const referencesHtml = references.map((ref, index) => {
+            console.log(`Processing reference ${index}:`, ref);
+            
+            // Handle different possible reference structures
+            let refId, refTitle;
+            
+            if (typeof ref === 'string') {
+                // Simple string reference (just an ID)
+                refId = ref;
+                refTitle = null;
+            } else if (typeof ref === 'object') {
+                // Object reference with possible fields
+                refId = ref.id || ref.particle_id || ref.reference_id || ref.ref_id || ref.target_id;
+                refTitle = ref.title || ref.name || ref.particle_title || null;
+            }
+            
+            console.log(`Extracted - ID: ${refId}, Title: ${refTitle}`);
+            
+            if (!refId) {
+                console.log('No valid ID found for reference, skipping');
+                return '';
+            }
+            
+            const displayText = refTitle ? `#${escapeHtml(refTitle)}` : `#${refId.substring(0,8)}`;
+            const tooltipText = refTitle ? `View referenced particle: ${escapeHtml(refTitle)}` : `View referenced particle: ${refId}`;
+            
+            return `<span class="particle-ref" onclick="viewParticleRef('${refId}')" title="${tooltipText}">${displayText}</span>`;
+        }).filter(html => html); // Filter out empty strings
+        
+        console.log('Generated references HTML:', referencesHtml);
+        return referencesHtml.join('');
+    } catch (error) {
+        console.error('Error rendering references:', error);
+        return '';
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function renderPagination(data) {
+/**
+ * Render pagination buttons, preserving fuzzy state.
+ *
+ * :param {object} data: API response with pagination info.
+ * :param {number} data.total_pages: Total pages.
+ * :param {number} data.page: Current page.
+ * :returns: {void}
+ */
+    const pagination = document.getElementById('pagination');
+    const totalPages = data.total_pages;
+    const cur = data.page;
+
+    if (totalPages <= 1) { 
+        pagination.innerHTML = ''; 
+        return; 
+    }
+
+    let html = '';
+    if (cur > 1) {
+        html += `<button onclick="loadParticles('${currentQuery}', ${cur - 1}, ${currentFuzzy})">Previous</button>`;
+    }
+
+    const start = Math.max(1, cur - 2);
+    const end = Math.min(totalPages, cur + 2);
+    for (let i = start; i <= end; i++) {
+        const active = i === cur ? 'active' : '';
+        html += `<button class="${active}" onclick="loadParticles('${currentQuery}', ${i}, ${currentFuzzy})">${i}</button>`;
+    }
+
+    if (cur < totalPages) {
+        html += `<button onclick="loadParticles('${currentQuery}', ${cur + 1}, ${currentFuzzy})">Next</button>`;
+    }
+
+    pagination.innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const ok = await checkAuth();
+    if (!ok) return;
+
+    loadParticles('', 1, 0);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const q = urlParams.get('query');
+    if (q) {
+        document.getElementById('search_box').value = q;
+        searchParticles();
+    }
+});
+  </script>
+</body>
+</html>

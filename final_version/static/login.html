@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIM Login</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<style>
+
+.center_wrapper {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin: 10px 0;
+}
+
+.btn {
+    background-color: #648FFF;
+    color: white;
+    border: none;
+    width: 100px;
+    height: 40px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #5e86eb;
+}
+
+body {
+    font-size: 1.2em;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+body > div {
+    width: 100%;
+    max-width: 400px;
+}
+
+.input_fields {
+    width: 300px;
+    height: 50px;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+input::placeholder {
+    font-size: 1em;
+    color: #999;
+}
+
+.error {
+    color: red;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.signup-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.signup-link button {
+    background: none;
+    border: none;
+    color: #648FFF;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 1em;
+}
+
+.signup-link button:hover {
+    color: #5e86eb;
+}
+</style>
+
+<body>
+    <div>
+        <div>
+            <h1 class="center_wrapper">PIM labs</h1>
+        </div>
+        
+        <form id="loginForm">
+            <div class="center_wrapper">
+                <input type="text" id="username" name="username" placeholder="Username" class="input_fields" required>
+                <input type="password" id="password" name="password" placeholder="Password" class="input_fields" required>
+            </div>
+            <div id="errorMessage" class="error" style="display: none;"></div>
+            <div class="center_wrapper">
+                <button type="submit" class="btn">Sign in</button>
+            </div>
+        </form>
+        
+        <div class="signup-link">
+            <p>Don't have an account?</p>
+            <button type="button" onclick="window.location.href='/signup'">Sign up</button>
+        </div>
+    </div>
+
+<script>
+    const API_BASE = '';
+
+async function login(username, password) { 
+/**
+* Authenticate a user with username and password.
+*
+* :param {string} username: The username of the user.
+* :param {string} password: The plain text password of the user.
+* :returns: {Promise<{success: boolean, data?: object, error?: string}>} 
+*           A promise resolving to an object with either success + data 
+*           or failure + error message.
+*/ 
+    try {
+        const response = await fetch(`${API_BASE}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password }),
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Login failed');
+        }
+
+        const data = await response.json();
+        return { success: true, data };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+// takes inputs for the login
+document.getElementById('loginForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const errorDiv = document.getElementById('errorMessage');
+
+    // Clear previous errors
+    errorDiv.style.display = 'none';
+
+    if (!username || !password) {
+        errorDiv.textContent = 'Please enter both username and password';
+        errorDiv.style.display = 'block';
+        return;
+    }
+
+    // disables form to avoid overloading
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Signing in...';
+    submitBtn.disabled = true;
+
+    try {
+        const result = await login(username, password);
+
+        if (result.success) {
+            // Successful login procedure
+            errorDiv.style.display = 'none';
+            window.location.href = '/search';
+        } else {
+            errorDiv.textContent = result.error || 'Login failed';
+            errorDiv.style.display = 'block';
+        }
+    } catch (error) {
+        errorDiv.textContent = 'Network error. Please try again.';
+        errorDiv.style.display = 'block';
+    } finally {
+        // Re-enable form for future attempts
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+});
+    </script>
+</body>
+</html>

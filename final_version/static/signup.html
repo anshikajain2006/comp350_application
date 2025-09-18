@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIM Sign Up</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<style>
+
+.center_wrapper {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin: 10px 0;
+}
+
+.btn {
+    background-color: #648FFF;
+    color: white;
+    border: none;
+    width: 150px;
+    height: 50px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #5e86eb;
+}
+
+body {
+    font-size: 1.2em;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+body > div {
+    width: 100%;
+    max-width: 400px;
+}
+
+.input_fields {
+    width: 300px;
+    height: 50px;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+input::placeholder {
+    font-size: 1em;
+    color: #999;
+}
+
+.error {
+    color: #DC267F;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.success {
+    color: #785EF0;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.login-link button {
+    background: none;
+    border: none;
+    color: #648FFF;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 1em;
+}
+
+.login-link button:hover {
+    color: #5e86eb;
+}
+</style>
+
+
+<body>
+    <div>
+        <div>
+            <h1 class="center_wrapper">PIM labs</h1>
+        </div>
+        
+        <form id="signupForm">
+            <div class="center_wrapper">
+                <input type="text" id="username" name="username" placeholder="Username" class="input_fields" required>
+                <input type="password" id="password" name="password" placeholder="Password" class="input_fields" required>
+            </div>
+            <div id="message" class="error" style="display: none;"></div>
+            <div class="center_wrapper">
+                <button type="submit" class="btn">Create Account</button>
+            </div>
+        </form>
+        
+        <div class="login-link">
+            <p>Already have an account?</p>
+            <button type="button" onclick="window.location.href='/'">Sign in</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+
+        async function signup(username, password) {
+        /**
+         * Create a new user account via the backend API.
+         *
+         * :param {string} username: Desired username.
+         * :param {string} password: Desired password (min length 6).
+         * :returns: {Promise<{success: boolean, data?: object, error?: string}>}
+         *           Resolves with success and data on success, otherwise error string.
+         */
+            try {
+                const response = await fetch(`${API_BASE}/auth/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password }),
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Sign up failed');
+                }
+
+                const data = await response.json();
+                return { success: true, data };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Handles signup submission and validates inputs
+        document.getElementById('signupForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+
+            // Clear previous messages
+            messageDiv.style.display = 'none';
+
+            if (!username || !password) {
+                messageDiv.textContent = 'Please enter both username and password';
+                messageDiv.className = 'error';
+                messageDiv.style.display = 'block';
+                return;
+            }
+
+            if (password.length < 6) {
+                messageDiv.textContent = 'Password must be at least 6 characters long';
+                messageDiv.className = 'error';
+                messageDiv.style.display = 'block';
+                return;
+            }
+
+            const result = await signup(username, password);
+
+            if (result.success) {
+                messageDiv.textContent = 'Account created successfully! Redirecting to login...';
+                messageDiv.className = 'success';
+                messageDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            } else {
+                messageDiv.textContent = result.error;
+                messageDiv.className = 'error';
+                messageDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
